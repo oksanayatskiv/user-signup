@@ -1,4 +1,6 @@
 from flask import Flask, request,redirect
+import cgi
+import re
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -61,34 +63,29 @@ def validate_time():
     verify = request.form['verify']
     email = request.form['email']
 	
-
     user_error=''
     password_error=''
     verify_error=''
     email_error=''
     
-	
-    if username=="":
+#Check User name 
+    #for empty input	
+    if username=='':
         user_error = "Please enter your name"
         username=''
-    
-    if ' '  in username:
-        user_error = error = "Please enter your name"
-        username= ''
-        #redirect ('/?error' + user_error)
-    else:
-        if username != "\w{3,20}":
-            user_error = "Please enter your name"
-            username=''
-            #redirect ('/?error' + user_error)        
-        
-		
+    #Check for not conaining space and is between 3 to 20 characters
+    user_regex = re.compile("^\S{3,20}$")
+    if not user_regex.match(username):
+        user_error = ("The user's username or password is not valid," 
+        "it should not contain a space character nor consist of less than 3 characters or"
+        "more than 20 characters.")
 
-    if password=="" or verify=="":
+    if password=="":
         password_error = "Please enter your password"
         #redirect('/?error' + password_error)
-	
-	
+    if verify=="":
+        verify_error="Please re-enter pasword"       
+        
     if ' '  in password:
         password_error = error = "Please enter your password"
         #redirect ('/?error' + password_error)
@@ -96,8 +93,7 @@ def validate_time():
         if password== "\w{3,20}":
             password_error = "Please enter your password"
             #redirect ('/?error' + password_error)
-            
-    
+
 	
     if len(password) != len(verify):
         if password != verify:
