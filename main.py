@@ -1,6 +1,12 @@
 from flask import Flask, request,redirect
 import cgi
 import re
+import os
+import jinja2
+
+template_dir = os.path.join(os.path.dirname(__file__),'templates')
+jinja_env= jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape=True )
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -43,8 +49,33 @@ form = """ <!DOCTYPE html>
                 </body>
         </html>
         """
+
+form_greeding = """ <!DOCTYPE html>
+        <html>
+            <head>
+                <style>
+                    .error {{
+                        color : red;
+                            }}
+                </style>
+            </head>
+                <body>
+                <h1> Greding{user_error} </h1>
+                <form atribute='/greeding' method = "post">
+                            <table>
+                                    <p><label for = "username">Username
+                                    <span class= "error">{user_error}<span></p>
+                            </table>
+                        </form>
+                </body>
+        </html>
+        """        
 content = form 
 
+@app.route("/")
+def index():
+    template = jinja_env.get_template('html.form')
+    return template.render()
 
 @app.route('/valide')
 def display_valide():
@@ -108,22 +139,15 @@ def validate_time():
         email_ct_dot = email.count('.')
         #email_regex = re.compile("^\S{3,20}$")
         if email_ct_dot>1 or email_ct>1:
-            email_error = 'Please enter valid email'
+            email_error = 'Please enter one . or @'
         elif email_ct_dot==0 or email_ct==0:
-            email_error = 'Please enter valid email'
+            email_error = 'Please enter at least one . or one @'
         else:
             email_regex = re.compile("^\S{3,20}$")
             if not email_regex.match(email):
-                email_error = 'Please enter valid email'
+                email_error = 'Please enter email not more than 20 and less than 3 character'
             
             
-        
-        #email_regex = re.compile("^\S{3,20}$")
-        #email_regex1 = re.findall("^@$")
-        #f not email_regex.match(email) and email_regex.match(email_regex1):
-           # email_error = 'Please enter valid email'
-            
-	
     if not user_error and not password_error and not verify_error and not email_error:
         return redirect('/greeding')
     else:
@@ -131,11 +155,25 @@ def validate_time():
             password_error= password_error,verify_error=verify_error,
             username=username, password='', verify='',
             email_error=email_error, email=email)
-
+"""
 @app.route('/greeding', methods=['POST'])
 def validated():
     user = request.form["username"]
     return "<p>" + "Welcome,"+ user +"!.</p>"
-		
 	
+"""
+
+@app.route('/greeding')
+def display_greeding():
+	return form_greeding.format(username= '66', user_error='77')
+	
+@app.route('/greeding', methods=['POST'])
+def validate_greeding1():
+    username = request.form['username']
+    return form_greeding.format(user_error="999")
+
+
+
+
+
 app.run()
