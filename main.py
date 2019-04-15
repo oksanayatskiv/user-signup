@@ -27,11 +27,11 @@ form = """ <!DOCTYPE html>
                                     
                                     
                                     <p><label for = "password">Password 
-                                    <input type = "text" name ="password" id="password" value ='{password}'></label>
+                                    <input type = "password" name ="password" id="password" value ='{password}'></label>
                                     <span class= "error">{password_error}</span></p>
                                     
                                     <p><label for = "verify">Verify Password    
-                                    <input type = "text" name ="verify" id="verify" value = '{verify}'/></label>
+                                    <input type = "password" name ="verify" id="verify" value = '{verify}'/></label>
                                     <span class= "error">{verify_error}</span></p>
 
                                     <p><label for = "email">Email (optional)
@@ -72,38 +72,59 @@ def validate_time():
     #for empty input	
     if username=='':
         user_error = "Please enter your name"
-        username=''
-    #Check for not conaining space and is between 3 to 20 characters
-    user_regex = re.compile("^\S{3,20}$")
-    if not user_regex.match(username):
-        user_error = ("The user's username or password is not valid," 
-        "it should not contain a space character nor consist of less than 3 characters or"
-        "more than 20 characters.")
+    else:
+        #Check for not conaining space and is between 3 to 20 characters
+        user_regex = re.compile("^\S{3,20}$")
+        if not user_regex.match(username):
+            user_error = ("The user's username or password is not valid," 
+            "it should not contain a space character nor consist of less than 3 characters or"
+            "more than 20 characters.")
 
     if password=="":
         password_error = "Please enter your password"
-        #redirect('/?error' + password_error)
-    if verify=="":
-        verify_error="Please re-enter pasword"       
-        
-    if ' '  in password:
-        password_error = error = "Please enter your password"
-        #redirect ('/?error' + password_error)
     else:
-        if password== "\w{3,20}":
-            password_error = "Please enter your password"
-            #redirect ('/?error' + password_error)
+        #Check for not conaining space and is between 3 to 20 characters
+        pass_regex = re.compile("^\S{3,20}$")
+        if not pass_regex.match(password):
+            password_error = ("The user's username or password is not valid," 
+            "it should not contain a space character nor consist of less than 3 characters or"
+            "more than 20 characters.")
 
-	
-    if len(password) != len(verify):
-        if password != verify:
-            verify_error = "Your password doesn't match"
-            #redirect ('/?error' + user_error)
+    if verify=="":
+        verify_error="Please re-enter pasword"
+    elif password != verify:
+        verify_error = "Your password doesn't match"
+    else:
+    #Check for not conaining space and is between 3 to 20 characters
+        verify_regex = re.compile("^\S{3,20}$")
+        if not verify_regex.match(verify):
+            verify_error = ("The user's username or password is not valid," 
+            "it should not contain a space character nor consist of less than 3 characters or"
+            "more than 20 characters.")
+
+    #Validate email if not empty on presents one . and  one @ and between 3 to 20 characters
     if email != '':
-        if email != '.' or email !="\w{3,20}" or mail != '@':
-            email_error = 'Please enter valid email' 
+        email_ct = email.count('@')
+        email_ct_dot = email.count('.')
+        #email_regex = re.compile("^\S{3,20}$")
+        if email_ct_dot>1 or email_ct>1:
+            email_error = 'Please enter valid email'
+        elif email_ct_dot==0 or email_ct==0:
+            email_error = 'Please enter valid email'
+        else:
+            email_regex = re.compile("^\S{3,20}$")
+            if not email_regex.match(email):
+                email_error = 'Please enter valid email'
+            
+            
+        
+        #email_regex = re.compile("^\S{3,20}$")
+        #email_regex1 = re.findall("^@$")
+        #f not email_regex.match(email) and email_regex.match(email_regex1):
+           # email_error = 'Please enter valid email'
+            
 	
-    if not user_error and not password_error and not verify_error:
+    if not user_error and not password_error and not verify_error and not email_error:
         return redirect('/greeding')
     else:
         return content.format(user_error=user_error,
