@@ -13,76 +13,10 @@ app.config['DEBUG'] = True
 
 
 
-
-form = """ <!DOCTYPE html>
-        <html>
-            <head>
-                <style>
-                    .error {{
-                        color : red;
-                            }}
-                </style>
-            </head>
-                <body>
-                <h1> Signup </h1>
-                <form atribute='/val_signup' method = "post">
-                            <table>
-                                    <p><label for = "username">Username
-                                    <input type = "text" name ="username" id="username" value = '{username}'></label>
-                                    <span class= "error">{user_error}<span></p>
-                                    
-                                    
-                                    <p><label for = "password">Password 
-                                    <input type = "password" name ="password" id="password" value ='{password}'></label>
-                                    <span class= "error">{password_error}</span></p>
-                                    
-                                    <p><label for = "verify">Verify Password    
-                                    <input type = "password" name ="verify" id="verify" value = '{verify}'/></label>
-                                    <span class= "error">{verify_error}</span></p>
-
-                                    <p><label for = "email">Email (optional)
-                                    <input type = "text" name ="email" id="email" value = '{email}'/></label>
-                                    <span class= "error">{email_error}<span></p>
-                                    <input type= "submit" value = "Submit"/>
-                            </table>
-                        </form>
-                </body>
-        </html>
-        """
-
-form_greeding = """ <!DOCTYPE html>
-        <html>
-            <head>
-                <style>
-                    .error {{
-                        color : red;
-                            }}
-                </style>
-            </head>
-                <body>
-                <h1> Greding{user_error} </h1>
-                <form atribute='/greeding' method = "post">
-                            <table>
-                                    <p><label for = "username">Username
-                                    <span class= "error">{user_error}<span></p>
-                            </table>
-                        </form>
-                </body>
-        </html>
-        """        
-content = form 
-
-@app.route("/")
-def index():
-    template = jinja_env.get_template('html.form')
-    return template.render()
-
 @app.route('/valide')
 def display_valide():
-	return form.format(username= '', user_error= '',
-		password = '', password_error= '',
-		verify = '', verify_error= '',
-		email= '', email_error= '')
+    template = jinja_env.get_template('signupform.html')
+    return template.render()
 
 
 	
@@ -107,7 +41,7 @@ def validate_time():
         #Check for not conaining space and is between 3 to 20 characters
         user_regex = re.compile("^\S{3,20}$")
         if not user_regex.match(username):
-            user_error = ("The user's username or password is not valid," 
+            user_error = ("The user's username is not valid," 
             "it should not contain a space character nor consist of less than 3 characters or"
             "more than 20 characters.")
 
@@ -117,7 +51,7 @@ def validate_time():
         #Check for not conaining space and is between 3 to 20 characters
         pass_regex = re.compile("^\S{3,20}$")
         if not pass_regex.match(password):
-            password_error = ("The user's username or password is not valid," 
+            password_error = ("The user's  password is not valid," 
             "it should not contain a space character nor consist of less than 3 characters or"
             "more than 20 characters.")
 
@@ -147,32 +81,22 @@ def validate_time():
             if not email_regex.match(email):
                 email_error = 'Please enter email not more than 20 and less than 3 character'
             
-            
     if not user_error and not password_error and not verify_error and not email_error:
-        return redirect('/greeding')
+        name = str(username)
+        return redirect('/greeding?name={0}'.format(name))
     else:
-        return content.format(user_error=user_error,
+        template = jinja_env.get_template('signupform.html')
+        return template.render(user_error=user_error,
             password_error= password_error,verify_error=verify_error,
             username=username, password='', verify='',
             email_error=email_error, email=email)
-"""
-@app.route('/greeding', methods=['POST'])
-def validated():
-    user = request.form["username"]
-    return "<p>" + "Welcome,"+ user +"!.</p>"
-	
-"""
 
 @app.route('/greeding')
-def display_greeding():
-	return form_greeding.format(username= '66', user_error='77')
-	
-@app.route('/greeding', methods=['POST'])
-def validate_greeding1():
-    username = request.form['username']
-    return form_greeding.format(user_error="999")
-
-
+def validated():
+    name = request.args.get('name')
+    #return '<p>Welcome,'+ name+ '!</p>'
+    template = jinja_env.get_template('welcome.html')
+    return template.render(myname=name)
 
 
 
